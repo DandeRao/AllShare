@@ -1,21 +1,32 @@
 package com.allshare_back4app.Fragments;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.allshare_back4app.MainActivity;
 import com.allshare_back4app.MainActivity_1;
 import com.allshare_back4app.Model.Request;
 import com.allshare_back4app.Model.Requests;
 import com.allshare_back4app.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -23,9 +34,18 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.LOCATION_SERVICE;
 
-public class RequestsList extends ActionBarItemsHandler {
+
+public class RequestsList extends ActionBarItemsHandler implements AdapterView.OnItemSelectedListener{
     ListView requestsList;
+    public double lattitide;
+    public double longitude;
+    double maxDistance = 10.0;
+    Spinner maxDistanceSpinner;
+    EditText maxDistanceET;
+    int TAG_CODE_PERMISSION_LOCATION;
+
     public RequestsList() {
         // Required empty public constructor
     }
@@ -34,22 +54,39 @@ public class RequestsList extends ActionBarItemsHandler {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-     //   System.out.println("called 1");
+        //   System.out.println("called 1");
         // Inflate the layout for this fragment
         setHasOptionsMenu(true);
-        View view =inflater.inflate(R.layout.fragment_requests_list, container, false);
+
+
+        View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
         requestsList = (ListView) view.findViewById(R.id.requestsList);
-        fetchRequests();
-       //List<Requests> list = fetchRequests();
-       // showRequests((ArrayList<Requests>) list);
+        maxDistanceSpinner = (Spinner) view.findViewById(R.id.maxDistance);
+        ArrayList<String> list = new ArrayList<String>();
+        list.add(10+"");
+        list.add(25+"");
+        list.add(50+"");
+        list.add(75+"");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_spinner_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        maxDistanceSpinner.setAdapter(dataAdapter);
+        maxDistanceSpinner.setOnItemSelectedListener(this);
+
+                fetchRequests();
+        //List<Requests> list = fetchRequests();
+        // showRequests((ArrayList<Requests>) list);
         requestsList.setClickable(true);
         requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ((MainActivity_1) getActivity()).setPosition(position);
-                ((MainActivity_1) getActivity()).replaceFragment(new RequestDetails(),true);
+                ((MainActivity_1) getActivity()).replaceFragment(new RequestDetails(), true);
             }
         });
+
+
+
+
         return view;
     }
 
@@ -60,8 +97,10 @@ public class RequestsList extends ActionBarItemsHandler {
 
 public void fetchRequests(){
     //System.out.println("Called 2");
+    ParseGeoPoint parsePoint = new ParseGeoPoint(((MainActivity_1) getActivity()).getCurrentLocation().getLatitude(),((MainActivity_1) getActivity()).getCurrentLocation().getLongitude());
     ParseQuery<Requests> query = new ParseQuery<Requests>("Requests");
     query.whereEqualTo("isAccepted", false);
+    query.whereWithinMiles("requestedLocation",parsePoint,maxDistance);
     query.findInBackground(new FindCallback<Requests>() {
         public void done(List<Requests> list, ParseException e) {
             if (e == null) {
@@ -176,4 +215,15 @@ public void fetchRequests(){
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+       maxDistance = Double.parseDouble(String.valueOf(maxDistanceSpinner.getSelectedItem()));
+        fetchRequests();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        maxDistance = 10.0;
+
+    }
 }

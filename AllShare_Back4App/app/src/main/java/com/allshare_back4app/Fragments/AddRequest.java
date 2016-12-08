@@ -20,8 +20,16 @@ import android.widget.TimePicker;
 import com.allshare_back4app.MainActivity_1;
 import com.allshare_back4app.Model.Requests;
 import com.allshare_back4app.R;
+import com.onesignal.OneSignal;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseInstallation;
 import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -120,6 +128,7 @@ public void addRequest(){
 new AsyncTask <String, Integer, String>() {
     @Override
     protected String doInBackground(String... params) {
+        ParseGeoPoint parseLocation = new ParseGeoPoint(((MainActivity_1) getActivity()).getCurrentLocation().getLatitude(),((MainActivity_1) getActivity()).getCurrentLocation().getLongitude());
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         Date dateobj = new Date();
         Requests request = new Requests();
@@ -129,7 +138,27 @@ new AsyncTask <String, Integer, String>() {
         request.put("requestedOn",df.format(dateobj));
         request.put("isAccepted",false);
         request.put("requestorEmail",ParseUser.getCurrentUser().getEmail());
+        request.put("requestedLocation",parseLocation);
         request.saveInBackground();
+        //sendPushNotifications();
+        ParseQuery pushQuery = ParseInstallation.getQuery();
+        ParsePush push = new ParsePush();
+        push.setQuery(pushQuery);
+        push.setMessage("User "+ ParseUser.getCurrentUser().getUsername()+" needs "+ params[1]);
+        push.setChannel("Requests");
+        push.sendInBackground();
+        try {
+            push.send();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        try {
+            OneSignal.postNotification(new JSONObject("{'contents': {'en':'Request Posted'}}"), null);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Notifications sent");
                return null;
     }
 }.execute(neededBy.getText().toString(),item.getText().toString());
@@ -139,11 +168,25 @@ new AsyncTask <String, Integer, String>() {
 
     public void sendPushNotifications(){
 
+
+
+        // Create our Installation query
+        ParseQuery pushQuery = ParseInstallation.getQuery();
+        pushQuery.whereEqualTo("channels", "Requests"); // Set the channel
+//        pushQuery.whereEqualTo("scores", true);
+
+// Send push notification to query
         ParsePush push = new ParsePush();
+        push.setQuery(pushQuery);
+        push.setMessage("User "+ ParseUser.getCurrentUser().getUsername()+" needs "+ item.getText().toString());
+        push.setChannel("Requests");
+         push.sendInBackground();
+
+     /*   ParsePush push = new ParsePush();
         push.setChannel("Requests");
         push.setMessage("User "+ ParseUser.getCurrentUser().getUsername()+" needs "+ item.getText().toString());
         push.sendInBackground();
-
+*/
 
     }
 }
