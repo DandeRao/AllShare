@@ -1,19 +1,17 @@
 package com.allshare_back4app;
 
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.os.Bundle;
 
 import com.allshare_back4app.Fragments.LoginFragment;
 import com.allshare_back4app.Model.Request;
@@ -21,10 +19,112 @@ import com.allshare_back4app.Model.Request;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+
+public class MainActivity extends AppCompatActivity implements LocationListener{
     List<Request> requests;
     int position;
+    int showing;
+    int TAG_CODE_PERMISSION_LOCATION;
+    Location currentLocation;
+
+    boolean hasLocation = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requests = new ArrayList<Request>();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION },
+                    TAG_CODE_PERMISSION_LOCATION);
+            System.out.println("Permission Not Granted for Location services");
+        }
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(currentLocation!=null){
+            locationManager.removeUpdates(this);
+        }
+//        System.out.println(currentLocation.toString());
+
+        setContentView(R.layout.activity_main);
+        System.out.println("Calling Login Fragment");
+        replaceFragment(new LoginFragment(), false);
+
+
+       // new FetchLocation().execute();
+       // locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,this,null);
+
+       /* new AsyncTask<>() {
+            private final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+                //Wait 10 seconds to see if we can get a location from either network or GPS, otherwise stop
+                Long t = Calendar.getInstance().getTimeInMillis();
+                while (!hasLocation && Calendar.getInstance().getTimeInMillis() - t < 15000) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                };
+                return null;
+            }
+
+            protected void onPreExecute()
+            {
+                this.dialog.setMessage("Searching");
+                this.dialog.show();
+            }
+
+
+            protected void onPostExecute(final Void unused)
+            {
+                if(this.dialog.isShowing())
+                {
+                    this.dialog.dismiss();
+                }
+
+                if (currentLocation != null)
+                {
+                    //useLocation();
+
+                }
+                else
+                {
+                    //Couldn't find location, do something like show an alert dialog
+                }
+            }
+        }.execute();*/
+
+       /* new Runnable() {
+            @Override
+            public void run() {
+                if (hasLocation){
+
+                else{
+                    try {
+                          Thread.sleep(1000);
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };*/
+
+
+
+
+    }
+
+
 
     public void replaceFragment(Fragment frag, boolean addToBackStack){
         System.out.println("Recahed Replacing function");
@@ -51,102 +151,80 @@ public class MainActivity extends AppCompatActivity
     public void setPosition(int position) {
         this.position = position;
     }
+    public int getShowing() {
+        return showing;
+    }
+
+    public void setShowing(int showing) {
+        this.showing = showing;
+    }
+
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-                requests = new ArrayList<Request>();
-       /* ParseObject.registerSubclass(Requests.class);
+    public void onLocationChanged(Location location) {
+        setCurrentLocation(location);
+        hasLocation = true;
+    }
 
-        Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("iHC7u9QFrvp51WsWHwOCCNaG8ASnJloDWjKXn20l")
-                .clientKey("UPAjRXifzfU96kZPW5bRbtnnxyi7wyq9LgjV6njj")
-                .server("https://parseapi.back4app.com/").build()
-        );
-        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-        installation.put("GCMSenderId", "855353218401");
-        installation.saveInBackground();
-        //ParseInstallation.getCurrentInstallation().saveInBackground();
-        ParsePush.subscribeInBackground("Requests");*/
-        setContentView(R.layout.activity_main2);
-        System.out.println("Calling Login Fragment");
-        replaceFragment(new LoginFragment(),false);
-        //setContentView(R.layout.activity_main2);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+   private class FetchLocation extends AsyncTask<Void,Void,Void>{
+
+        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+
+
+
+        @Override
+        protected void onPostExecute(Void o) {
+            super.onPostExecute(o);
+            if (this.dialog.isShowing()) {
+                this.dialog.dismiss();
             }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main2, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        @Override
+        protected Void doInBackground(Void... params) {
+            if(hasLocation){
+                setContentView(R.layout.activity_main);
+                System.out.println("Calling Login Fragment");
+                replaceFragment(new LoginFragment(), false);
+            }
+            else{
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setMessage("Inserting data...");
+            this.dialog.show();
+        }
     }
 }
+

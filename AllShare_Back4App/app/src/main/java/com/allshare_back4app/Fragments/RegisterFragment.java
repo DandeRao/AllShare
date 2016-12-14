@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.allshare_back4app.MainActivity_1;
+import com.allshare_back4app.MainActivity;
 import com.allshare_back4app.R;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -92,7 +92,7 @@ Button register;
             @Override
             public void done(ParseException e) {
                 alertDisplayer("Registration Successful Welcome", "User:" + userName.getText().toString() + " Login.Email:" + email.getText().toString());
-                ((MainActivity_1) getActivity()).replaceFragment(new RequestsList(),false);
+                ((MainActivity) getActivity()).replaceFragment(new RequestsList(),false);
             }
         });
 

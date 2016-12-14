@@ -6,22 +6,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.allshare_back4app.MainActivity_1;
-import com.allshare_back4app.Model.Request;
+import com.allshare_back4app.MainActivity;
 import com.allshare_back4app.Model.Requests;
 import com.allshare_back4app.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,7 +55,7 @@ public class UserProfile extends ActionBarItemsHandler {
                     requestsPosted.setText(" "+list.size()+"");
 
                     }
-                    //((MainActivity_1) getActivity()).setRequests(listOfRequests);
+                    //((MainActivity) getActivity()).setRequests(listOfRequests);
                     /*ArrayAdapter adapter = new ArrayAdapter<Request>( getContext(),android.R.layout.simple_list_item_1,listOfRequests);
                     requestsList.setAdapter(adapter);*/
 
@@ -81,7 +75,7 @@ public class UserProfile extends ActionBarItemsHandler {
                     requestsAccepted.setText(" "+list.size());
 
                 }
-                //((MainActivity_1) getActivity()).setRequests(listOfRequests);
+                //((MainActivity) getActivity()).setRequests(listOfRequests);
                     /*ArrayAdapter adapter = new ArrayAdapter<Request>( getContext(),android.R.layout.simple_list_item_1,listOfRequests);
                     requestsList.setAdapter(adapter);*/
 
@@ -92,15 +86,15 @@ public class UserProfile extends ActionBarItemsHandler {
         requestsAccepted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity_1) getActivity()).setShowing(1);
-                ((MainActivity_1) getActivity()).replaceFragment(new UserRequests(),true);
+                ((MainActivity) getActivity()).setShowing(1);
+                ((MainActivity) getActivity()).replaceFragment(new UserRequests(),true);
             }
         });
         requestsPosted.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity_1) getActivity()).setShowing(0);
-                ((MainActivity_1) getActivity()).replaceFragment(new UserRequests(),true);
+                ((MainActivity) getActivity()).setShowing(0);
+                ((MainActivity) getActivity()).replaceFragment(new UserRequests(),true);
             }
         });
         // Inflate the layout for this fragment

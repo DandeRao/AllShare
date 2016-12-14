@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.allshare_back4app.MainActivity_1;
+import com.allshare_back4app.MainActivity;
 import com.allshare_back4app.R;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -47,8 +47,8 @@ public class LoginFragment extends Fragment {
              progressDialog.show();
              progressDialog.dismiss();
              System.out.println("Current User "+currentUser.getUsername());
-             alertDisplayer("Welcome Back", "User:" + currentUser.getUsername() +" Login.Email:"+currentUser.getEmail());
-             ((MainActivity_1) getActivity()).replaceFragment(new RequestsList(),true);
+             alertDisplayer("Welcome Back", "User:" + currentUser.getUsername() +"\nEmail:"+currentUser.getEmail());
+             ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
 
          } else {
              // show the signup or login screen
@@ -78,7 +78,7 @@ public class LoginFragment extends Fragment {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity_1) getActivity()).replaceFragment(new RegisterFragment(),true);
+                ((MainActivity) getActivity()).replaceFragment(new RegisterFragment(),true);
             }
         });
         return view;
@@ -92,7 +92,7 @@ public class LoginFragment extends Fragment {
                 if (parseUser != null) {
                     progressDialog.dismiss();
                     getUserDetailFromParse();
-                    ((MainActivity_1) getActivity()).replaceFragment(new RequestsList(),true);
+                    ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
 
                 } else {
                     progressDialog.dismiss();
@@ -113,7 +113,7 @@ public class LoginFragment extends Fragment {
 
     }
     void alertDisplayer(String title,String message){
-        AlertDialog.Builder builder = new AlertDialog.Builder((MainActivity_1) getActivity())
+        AlertDialog.Builder builder = new AlertDialog.Builder((MainActivity) getActivity())
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {

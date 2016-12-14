@@ -6,7 +6,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.allshare_back4app.MainActivity_1;
+import com.allshare_back4app.MainActivity;
 import com.allshare_back4app.R;
 import com.parse.ParseUser;
 
@@ -24,19 +24,19 @@ public class ActionBarItemsHandler extends Fragment {
             case R.id.menu_sign_out:
                // Logout Line
                 ParseUser.logOut();
-                ((MainActivity_1) getActivity()).replaceFragment(new LoginFragment(),true);
+                ((MainActivity) getActivity()).replaceFragment(new LoginFragment(),true);
 
                 return true;
 
             case R.id.menu_profile:
                 // Logout Line
 
-                ((MainActivity_1) getActivity()).replaceFragment(new UserProfile(),true);
+                ((MainActivity) getActivity()).replaceFragment(new UserProfile(),true);
 
                 return true;
 
             case R.id.add_request:
-                ((MainActivity_1) getActivity()).replaceFragment(new AddRequest(), true);
+                ((MainActivity) getActivity()).replaceFragment(new AddRequest(), true);
                 return (true);
 
             case R.id.refresh_request:

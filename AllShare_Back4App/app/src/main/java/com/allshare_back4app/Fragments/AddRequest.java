@@ -17,7 +17,7 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.allshare_back4app.MainActivity_1;
+import com.allshare_back4app.MainActivity;
 import com.allshare_back4app.Model.Requests;
 import com.allshare_back4app.R;
 import com.onesignal.OneSignal;
@@ -79,23 +79,29 @@ public class AddRequest extends ActionBarItemsHandler {
             public void onClick(View v) {
 
                 System.out.println("Called on FocusChange");
-                new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                DatePickerDialog dp = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         neededByString = month+"/"+dayOfMonth+"/"+year;
-                        new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener(){
+                      TimePickerDialog tp =   new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener(){
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                 neededByString = neededByString + " "+ String.format("%02d",hourOfDay)+":"+String.format("%02d",minute);
                                 neededBy.setText(neededByString);
                             }
                         }, cal.get(Calendar.HOUR_OF_DAY),
-                                cal.get(Calendar.MINUTE), true).show();
+                                cal.get(Calendar.MINUTE), true);
+                        tp.show();
+
+
                     }
 
 
                 },cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH)).show();
+                        cal.get(Calendar.DAY_OF_MONTH));
+                dp.getDatePicker().setMinDate(System.currentTimeMillis() + 1000);
+                dp.setTitle("By when do you need it?");
+                dp.show();
             }
 
 
@@ -112,13 +118,14 @@ public class AddRequest extends ActionBarItemsHandler {
                     public void run() {
                         try {
                             addRequest();
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }).start();
                 progressDialog.dismiss();
-                ((MainActivity_1) getActivity()).replaceFragment(new RequestsList(),false);
+                ((MainActivity) getActivity()).replaceFragment(new RequestsList(),false);
             }
         });
     }
@@ -128,7 +135,7 @@ public void addRequest(){
 new AsyncTask <String, Integer, String>() {
     @Override
     protected String doInBackground(String... params) {
-        ParseGeoPoint parseLocation = new ParseGeoPoint(((MainActivity_1) getActivity()).getCurrentLocation().getLatitude(),((MainActivity_1) getActivity()).getCurrentLocation().getLongitude());
+        ParseGeoPoint parseLocation = new ParseGeoPoint(((MainActivity) getActivity()).getCurrentLocation().getLatitude(),((MainActivity) getActivity()).getCurrentLocation().getLongitude());
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         Date dateobj = new Date();
         Requests request = new Requests();
@@ -137,6 +144,8 @@ new AsyncTask <String, Integer, String>() {
         request.put("neededBy",params[0]);
         request.put("requestedOn",df.format(dateobj));
         request.put("isAccepted",false);
+        request.put("acceptedOn","Not Accepted Yet");
+        request.put("acceptedBy","Not Accepted Yet");
         request.put("requestorEmail",ParseUser.getCurrentUser().getEmail());
         request.put("requestedLocation",parseLocation);
         request.saveInBackground();

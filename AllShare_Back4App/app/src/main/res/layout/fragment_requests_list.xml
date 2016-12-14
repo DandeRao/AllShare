@@ -4,30 +4,38 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:layoutDirection="ltr"
+        >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Showing requests within miles"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:paddingLeft="80dp"
-            tools:textColor="@android:color/black" />
-
-        <Spinner
+     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/maxDistance"
-            android:textColor="#FFFFFF"
-            android:paddingLeft="20dp"
-            android:layout_marginLeft="20dp" />
-
+            android:text="Show requests within miles"
+            android:textColor="#000000"
+            android:layout_gravity="center"
+         android:textSize="16sp" />
+        <!--
+               <Spinner
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:id="@+id/maxDistance"
+                   android:textColor="#000000"
+                   />-->
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/maxDistance" />
     </LinearLayout>
+
 
     <ListView
         android:layout_width="match_parent"
@@ -35,5 +43,8 @@
         android:id="@+id/requestsList"
         android:clickable="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="30dp" />
+        android:layout_marginTop="2dp" />
+
+</LinearLayout>
+
 </LinearLayout>

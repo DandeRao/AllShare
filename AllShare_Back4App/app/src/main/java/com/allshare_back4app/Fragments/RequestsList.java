@@ -1,13 +1,6 @@
 package com.allshare_back4app.Fragments;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,25 +9,22 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.allshare_back4app.MainActivity;
-import com.allshare_back4app.MainActivity_1;
 import com.allshare_back4app.Model.Request;
 import com.allshare_back4app.Model.Requests;
 import com.allshare_back4app.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.Context.LOCATION_SERVICE;
 
 
 public class RequestsList extends ActionBarItemsHandler implements AdapterView.OnItemSelectedListener{
@@ -43,6 +33,7 @@ public class RequestsList extends ActionBarItemsHandler implements AdapterView.O
     public double longitude;
     double maxDistance = 10.0;
     Spinner maxDistanceSpinner;
+    SeekBar maxDistanceSeekBar;
     EditText maxDistanceET;
     int TAG_CODE_PERMISSION_LOCATION;
 
@@ -61,16 +52,41 @@ public class RequestsList extends ActionBarItemsHandler implements AdapterView.O
 
         View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
         requestsList = (ListView) view.findViewById(R.id.requestsList);
-        maxDistanceSpinner = (Spinner) view.findViewById(R.id.maxDistance);
-        ArrayList<String> list = new ArrayList<String>();
+        //maxDistanceSpinner = (Spinner) view.findViewById(R.id.maxDistance);
+        maxDistanceSeekBar = (SeekBar) view.findViewById(R.id.maxDistance);
+        maxDistanceSeekBar.setProgress((int) maxDistance);
+        maxDistanceSeekBar.setMax(75);
+
+
+maxDistanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        maxDistance = (double) progress;
+        maxDistance = (maxDistance<5?5:maxDistance);
+
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        Toast.makeText(getContext(),"Showing requests within "+ (int) maxDistance + " miles.", Toast.LENGTH_SHORT).show();
+        refreshRequests();
+    }
+});
+     /*  *//* ArrayList<String> list = new ArrayList<String>();
         list.add(10+"");
         list.add(25+"");
         list.add(50+"");
-        list.add(75+"");
+        list.add(75+"");*//*
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_spinner_item, list);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        maxDistanceSpinner.setAdapter(dataAdapter);
-        maxDistanceSpinner.setOnItemSelectedListener(this);
+       *//* maxDistanceSpinner.setAdapter(dataAdapter);
+        maxDistanceSpinner.setOnItemSelectedListener(this);*/
 
                 fetchRequests();
         //List<Requests> list = fetchRequests();
@@ -79,8 +95,8 @@ public class RequestsList extends ActionBarItemsHandler implements AdapterView.O
         requestsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ((MainActivity_1) getActivity()).setPosition(position);
-                ((MainActivity_1) getActivity()).replaceFragment(new RequestDetails(), true);
+                ((MainActivity) getActivity()).setPosition(position);
+                ((MainActivity) getActivity()).replaceFragment(new RequestDetails(), true);
             }
         });
 
@@ -97,7 +113,8 @@ public class RequestsList extends ActionBarItemsHandler implements AdapterView.O
 
 public void fetchRequests(){
     //System.out.println("Called 2");
-    ParseGeoPoint parsePoint = new ParseGeoPoint(((MainActivity_1) getActivity()).getCurrentLocation().getLatitude(),((MainActivity_1) getActivity()).getCurrentLocation().getLongitude());
+
+    ParseGeoPoint parsePoint = new ParseGeoPoint(((MainActivity) getActivity()).getCurrentLocation().getLatitude(),((MainActivity) getActivity()).getCurrentLocation().getLongitude());
     ParseQuery<Requests> query = new ParseQuery<Requests>("Requests");
     query.whereEqualTo("isAccepted", false);
     query.whereWithinMiles("requestedLocation",parsePoint,maxDistance);
@@ -113,17 +130,21 @@ public void fetchRequests(){
 
                 //    System.out.println(r.getString("item"));
                     Request nr = new Request();
+
                     nr.setItem(r.getString("item"));
                     nr.setNeededBy(r.getString("neededBy"));
                     nr.setRequestedBy(r.getString("RequestedBy"));
                     nr.setRequestedOn(r.getString("requestedOn"));
+                    nr.setPostedOn(r.getString("acceptedOn"));
                     System.out.println("Getting objectIds "+ r.getObjectId());
                     nr.setObjectId(r.getObjectId());
+
                  //   System.out.println(nr.toString());
                     listOfRequests.add(nr);
                 }
-                ((MainActivity_1) getActivity()).setRequests(listOfRequests);
-                ArrayAdapter adapter = new ArrayAdapter<Request>( getContext(),android.R.layout.simple_list_item_1,listOfRequests);
+                ((MainActivity) getActivity()).setRequests(listOfRequests);
+              //  ArrayAdapter adapter = new ArrayAdapter<Request>( getContext(),android.R.layout.simple_list_item_1,listOfRequests);
+               ArrayAdapter adapter = new RequestAdapter(getContext(),R.layout.request_adapter,R.id.row_request_item,listOfRequests);
                 requestsList.setAdapter(adapter);
 
             } else {
@@ -196,12 +217,12 @@ public void fetchRequests(){
             case R.id.menu_sign_out:
                 // Logout Line
                 ParseUser.logOut();
-                ((MainActivity_1) getActivity()).replaceFragment(new LoginFragment(),true);
+                ((MainActivity) getActivity()).replaceFragment(new LoginFragment(),true);
 
                 return true;
 
             case R.id.add_request:
-                ((MainActivity_1) getActivity()).replaceFragment(new AddRequest(), true);
+                ((MainActivity) getActivity()).replaceFragment(new AddRequest(), true);
                 return (true);
 
             case R.id.refresh_request:

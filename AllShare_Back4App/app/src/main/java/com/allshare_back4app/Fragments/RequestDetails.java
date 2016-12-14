@@ -13,32 +13,24 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.allshare_back4app.MainActivity_1;
+import com.allshare_back4app.MainActivity;
 import com.allshare_back4app.Model.Request;
 import com.allshare_back4app.Model.Requests;
 import com.allshare_back4app.R;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import org.json.JSONException;
-
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -115,8 +107,8 @@ public class RequestDetails extends ActionBarItemsHandler {
                 return gesture.onTouchEvent(event);
             }
         });
-        currentPosition  = ((MainActivity_1) getActivity()).getPosition();
-        listEnd = ((MainActivity_1) getActivity()).getRequests().size();
+        currentPosition  = ((MainActivity) getActivity()).getPosition();
+        listEnd = ((MainActivity) getActivity()).getRequests().size();
         item = (EditText) view.findViewById(R.id.item);
         neededBy = (EditText) view.findViewById(R.id.neededBy);
         requestedBy = (EditText) view.findViewById(R.id.requestedBy);
@@ -128,7 +120,7 @@ public class RequestDetails extends ActionBarItemsHandler {
         goBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity_1) getActivity()).replaceFragment(new RequestsList(),true);
+                ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
             }
         });
 
@@ -138,12 +130,12 @@ public class RequestDetails extends ActionBarItemsHandler {
             @Override
             public void onClick(View v) {
                 System.out.println("Position is "+ currentPosition);
-                System.out.println("Object Id is: "+((MainActivity_1)getActivity()).getRequests().get(currentPosition).getObjectId());
+                System.out.println("Object Id is: "+((MainActivity)getActivity()).getRequests().get(currentPosition).getObjectId());
                 ParseQuery<Requests> query = ParseQuery.getQuery("Requests");
 
 
 // Retrieve the object by id
-                query.getInBackground(((MainActivity_1)getActivity()).getRequests().get(currentPosition).getObjectId(), new GetCallback<Requests>() {
+                query.getInBackground(((MainActivity)getActivity()).getRequests().get(currentPosition).getObjectId(), new GetCallback<Requests>() {
                     public void done(final Requests currentRequest, ParseException e) {
                         if (e == null) {
                             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
@@ -171,17 +163,17 @@ public class RequestDetails extends ActionBarItemsHandler {
                         else{e.printStackTrace();}
                     }
                 });
-                ((MainActivity_1) getActivity()).replaceFragment(new RequestsList(),true);
+                ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
             }
         });
-        loadRequestDetails(((MainActivity_1)getActivity()).getPosition());
+        loadRequestDetails(((MainActivity)getActivity()).getPosition());
 
         return view;
     }
 
     public void loadRequestDetails(int position){
         System.out.println("Position is "+position);
-        Request req = ((MainActivity_1) getActivity()).getRequests().get(position);
+        Request req = ((MainActivity) getActivity()).getRequests().get(position);
      //   System.out.println(req.toString());
         item.setText(req.getItem());
         neededBy.setText(req.getNeededBy());
@@ -191,6 +183,10 @@ public class RequestDetails extends ActionBarItemsHandler {
         System.out.println("current user ");*/
         if(req.getRequestedBy().equals(ParseUser.getCurrentUser().getUsername())){
             acceptRequest.setVisibility(View.GONE);
+        }
+        else
+        {
+            acceptRequest.setVisibility(View.VISIBLE);
         }
 
 

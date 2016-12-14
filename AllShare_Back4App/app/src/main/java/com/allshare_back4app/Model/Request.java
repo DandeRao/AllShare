@@ -1,5 +1,7 @@
 package com.allshare_back4app.Model;
 
+import java.util.Date;
+
 /**
  * Created by mkrao on 11/19/2016.
  */
@@ -12,6 +14,15 @@ public class Request {
     String item;
     boolean isAccepted;
     String objectId;
+    String postedOn;
+
+    public String getPostedOn() {
+        return postedOn;
+    }
+
+    public void setPostedOn(String postedOn) {
+        this.postedOn = postedOn;
+    }
 
     public String getObjectId() {
         return objectId;
@@ -64,8 +75,8 @@ public class Request {
         this.requestedBy = requestedBy;
     }
 
-    @Override
+   /* @Override
     public String toString() {
         return  item  +"\n"+"Requested By: " + requestedBy;
-    }
+    }*/
 }
