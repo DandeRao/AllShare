@@ -2,9 +2,11 @@ package com.allshare_back4app.Fragments;
 
 
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -14,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -49,6 +52,9 @@ public class AddRequest extends ActionBarItemsHandler {
     Calendar cal = Calendar.getInstance();
     ProgressDialog progressDialog;
     String neededByString;
+    EditText itemET;
+    EditText neededByET;
+
     public AddRequest() {
         // Required empty public constructor
     }
@@ -60,11 +66,13 @@ public class AddRequest extends ActionBarItemsHandler {
         // Inflate the layout for this fragment
 
         setHasOptionsMenu(true);
+
         View view = inflater.inflate(R.layout.fragment_add_request, container, false);
-        item = (TextView) view.findViewById(R.id.item);
+        item = (TextView) view.findViewById(R.id.item_label);
         neededBy = (TextView) view.findViewById(R.id.needed_by);
         addRequest = (Button) view.findViewById(R.id.add_request);
-
+        itemET = (EditText) view.findViewById(R.id.item);
+        neededByET = (EditText) view.findViewById(R.id.needed_by);
         return view;
     }
 
@@ -82,7 +90,7 @@ public class AddRequest extends ActionBarItemsHandler {
                 DatePickerDialog dp = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        neededByString = month+"/"+dayOfMonth+"/"+year;
+                        neededByString = (month+1)+"/"+dayOfMonth+"/"+year;
                       TimePickerDialog tp =   new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener(){
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -110,27 +118,47 @@ public class AddRequest extends ActionBarItemsHandler {
         addRequest.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog.setMessage("Please Wait");
-                progressDialog.setTitle("Adding the request to pool...");
-                progressDialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            addRequest();
+                if (itemET.getText().toString().length() == 0 || neededByET.getText().toString().length() == 0) {
+                    String message = "";
+                    message = (itemET.getText().toString().length() == 0) ? " Item " : message;
+                    message = (itemET.getText().toString().length() == 0 && neededByET.getText().toString().length() == 0) ? message + " and " : message;
+                    message = (neededByET.getText().toString().length() == 0) ? message+"Needed By" : message;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Please enter " + message)
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    System.out.println("Entered Else");
+                    progressDialog.setMessage("Please Wait");
+                    progressDialog.setTitle("Adding the request to pool...");
+                    progressDialog.show();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                addRequest();
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                }).start();
-                progressDialog.dismiss();
-                ((MainActivity) getActivity()).replaceFragment(new RequestsList(),false);
+                    }).start();
+                    progressDialog.dismiss();
+                    ((MainActivity) getActivity()).replaceFragment(new RequestsList(), false);
+                }
             }
         });
+
     }
 
 public void addRequest(){
+
 
 new AsyncTask <String, Integer, String>() {
     @Override
@@ -170,7 +198,7 @@ new AsyncTask <String, Integer, String>() {
         System.out.println("Notifications sent");
                return null;
     }
-}.execute(neededBy.getText().toString(),item.getText().toString());
+}.execute(neededByET.getText().toString(),itemET.getText().toString());
 
 }
 

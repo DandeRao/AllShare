@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class RequestsList extends ActionBarItemsHandler implements AdapterView.OnItemSelectedListener{
+public class RequestsList extends ActionBarItemsHandler {
     ListView requestsList;
     public double lattitide;
     public double longitude;
-    double maxDistance = 10.0;
+    double maxDistance;
     Spinner maxDistanceSpinner;
     SeekBar maxDistanceSeekBar;
     EditText maxDistanceET;
@@ -48,7 +48,7 @@ public class RequestsList extends ActionBarItemsHandler implements AdapterView.O
         //   System.out.println("called 1");
         // Inflate the layout for this fragment
         setHasOptionsMenu(true);
-
+        maxDistance = ((MainActivity) getActivity()).getMaxDistanceForSeeker();
 
         View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
         requestsList = (ListView) view.findViewById(R.id.requestsList);
@@ -56,15 +56,16 @@ public class RequestsList extends ActionBarItemsHandler implements AdapterView.O
         maxDistanceSeekBar = (SeekBar) view.findViewById(R.id.maxDistance);
         maxDistanceSeekBar.setProgress((int) maxDistance);
         maxDistanceSeekBar.setMax(75);
-
+        System.out.println("Max distance is :"+maxDistance);
 
 maxDistanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         maxDistance = (double) progress;
-        maxDistance = (maxDistance<5?5:maxDistance);
-
-
+        System.out.println("Max Distance set from slider progress to (Progress):"+progress);
+        maxDistance = (maxDistance<=10.0?10.0:maxDistance);
+        ((MainActivity) getActivity()).setMaxDistanceForSeeker(maxDistance);
+        System.out.println("Max Distance set from slider progress to :"+((MainActivity) getActivity()).getMaxDistanceForSeeker());
     }
 
     @Override
@@ -96,6 +97,7 @@ maxDistanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListene
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ((MainActivity) getActivity()).setPosition(position);
+                ((MainActivity) getActivity()).setCurrentPosition(position);
                 ((MainActivity) getActivity()).replaceFragment(new RequestDetails(), true);
             }
         });
@@ -153,62 +155,8 @@ public void fetchRequests(){
         }
     });
 
-    /*ParseQuery<Requests> query = new ParseQuery("Requests");
-    query.setLimit(10);
-    try {
-
-        ArrayList<Requests> listOfRequests =  (ArrayList) query.find();
-        ArrayList<Request> lr = new ArrayList<>();
-        for(Requests r:listOfRequests){
-            System.out.println(r.getString("item"));
-            Request nr = new Request();
-            nr.setItem(r.getString("item"));
-            nr.setNeededBy(r.getString("neededBy"));
-            nr.setRequestedBy(r.getString("requestedBy"));
-            nr.setRequestedOn(r.getString("requestedOn"));
-            System.out.println(nr.toString());
-            lr.add(nr);
-        }
-        //ArrayList<Requests> listOfRequests =
-        ArrayAdapter adapter = new ArrayAdapter<Requests>( getContext(),android.R.layout.simple_list_item_1,listOfRequests);
-        requestsList.setAdapter(adapter);
-    }catch (Exception e){
-        e.printStackTrace();
-    }*/
-   /* query.find(new FindCallback<Requests>() {
-        @Override
-        public void done(List<Requests> list, ParseException e) {
-            System.out.println("got from server"+list.size());
-            System.out.println(Arrays.toString(list.toArray()));
-        //    ((MainActivity) getActivity()).setRequests(list);
-            ArrayList<Requests> listOfRequests = new ArrayList<Request>();
-            for(ParseObject r:list){
-                System.out.println(r.getString("item"));
-                Request nr = new Request();
-                nr.setItem(r.getString("item"));
-                nr.setNeededBy(r.getString("neededBy"));
-                nr.setRequestedBy(r.getString("requestedBy"));
-                nr.setRequestedOn(r.getString("requestedOn"));
-                System.out.println(nr.toString());
-                listOfRequests.add(nr);
-            }
-
-            ArrayAdapter adapter = new ArrayAdapter<Request>( getContext(),android.R.layout.simple_list_item_1,listOfRequests);
-            requestsList.setAdapter(adapter);
-
-        }
-
-        })*/;
-
-   // return ((MainActivity) getActivity()).getRequests();
 }
 
-    public void showRequests(ArrayList<Requests> req){
-      //  System.out.println("Called 3");
-    //    System.out.println("got Requests"+req.size());
-        ArrayAdapter adapter = new ArrayAdapter<Requests>( getContext(),android.R.layout.simple_list_item_1,req);
-        requestsList.setAdapter(adapter);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -236,15 +184,5 @@ public void fetchRequests(){
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-       maxDistance = Double.parseDouble(String.valueOf(maxDistanceSpinner.getSelectedItem()));
-        fetchRequests();
-    }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        maxDistance = 10.0;
-
-    }
 }

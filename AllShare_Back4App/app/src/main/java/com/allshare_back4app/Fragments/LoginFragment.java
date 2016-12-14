@@ -109,7 +109,7 @@ public class LoginFragment extends Fragment {
 
      /*   t_username.setText(user.getUsername());
         t_email.setText(user.getEmail());*/
-        alertDisplayer("Welcome Back", "User:" + user.getUsername() +" Login.Email:"+user.getEmail());
+        alertDisplayer("Welcome Back", "User:" + user.getUsername() +"\nEmail:"+user.getEmail());
 
     }
     void alertDisplayer(String title,String message){

@@ -26,13 +26,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     int showing;
     int TAG_CODE_PERMISSION_LOCATION;
     Location currentLocation;
-
+    int currentPosition;
     boolean hasLocation = false;
+    double maxDistanceForSeeker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        currentPosition =1;
         requests = new ArrayList<Request>();
+        maxDistanceForSeeker = 10.0;
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {
                             android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -134,6 +138,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             ft.addToBackStack(frag.toString());
         }
         ft.commit();
+    }
+
+    public Double getMaxDistanceForSeeker() {
+        return maxDistanceForSeeker;
+    }
+
+    public void setMaxDistanceForSeeker(Double maxDistance) {
+        this.maxDistanceForSeeker = maxDistance;
+
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(int currentPosition) {
+        this.currentPosition = currentPosition;
     }
 
     public List<Request> getRequests() {

@@ -24,8 +24,9 @@ public class ActionBarItemsHandler extends Fragment {
             case R.id.menu_sign_out:
                // Logout Line
                 ParseUser.logOut();
+                Toast toastLogout = Toast.makeText(getActivity(), "Logged Out", Toast.LENGTH_SHORT);
+                toastLogout.show();
                 ((MainActivity) getActivity()).replaceFragment(new LoginFragment(),true);
-
                 return true;
 
             case R.id.menu_profile:
@@ -41,7 +42,7 @@ public class ActionBarItemsHandler extends Fragment {
 
             case R.id.refresh_request:
             //    Call Load Request Method
-                Toast toast = Toast.makeText(getActivity(), "Refreshed", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(getActivity(), "Refreshed", Toast.LENGTH_SHORT);
                 toast.show();
                 return (true);
         }

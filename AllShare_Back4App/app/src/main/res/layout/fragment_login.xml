@@ -1,4 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,17 +10,48 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="10dp">
 
+            <TextView
+                android:text="Welcome to All Share"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:id="@+id/textView" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/icon"
+                android:id="@+id/imageView"
+                android:layout_weight="1"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:text="Please Login to Continue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView2"
+                android:textSize="16sp"
+                android:textAlignment="center"
+                android:paddingTop="10dp" />
+
             <TextView android:id="@+id/login_label_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
-                android:text="User Name"/>
+                android:text="User Name"
+                android:paddingTop="10dp"
+                android:layout_marginTop="10dp"
+                android:textAlignment="center" />
 
             <EditText
                 android:id="@+id/userName"
@@ -33,7 +66,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:paddingTop="10dp"
-                android:text="Password"/>
+                android:text="Password"
+                android:textAlignment="center" />
 
             <EditText
                 android:id="@+id/password"
@@ -50,6 +84,13 @@
                 android:layout_margin="10dp"
                 android:text="Login"
                 />
+
+            <TextView
+                android:text="Don't have an Account? "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView4"
+                android:textAlignment="center" />
 
             <Button
                 android:text="Register"

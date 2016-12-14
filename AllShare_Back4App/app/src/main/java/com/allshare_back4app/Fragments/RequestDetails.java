@@ -3,7 +3,11 @@ package com.allshare_back4app.Fragments;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -44,16 +48,14 @@ public class RequestDetails extends ActionBarItemsHandler {
     EditText requestedOn;
     Button goBack;
     Button acceptRequest;
-
-
     static Properties mailServerProperties;
     static Session getMailSession;
     static MimeMessage generateMailMessage;
 
-
+    int currrentRequestPosition;
     private static final int SWIPE_THRESHOLD = 100;
     private static final int SWIPE_VELOCITY_THRESHOLD = 100;
-    int currentPosition;
+
     int listEnd ;
        final GestureDetector gesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
@@ -99,6 +101,7 @@ public class RequestDetails extends ActionBarItemsHandler {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_request_details, container, false);
         setHasOptionsMenu(true);
         view.setOnTouchListener(new View.OnTouchListener() {
@@ -107,7 +110,7 @@ public class RequestDetails extends ActionBarItemsHandler {
                 return gesture.onTouchEvent(event);
             }
         });
-        currentPosition  = ((MainActivity) getActivity()).getPosition();
+        currrentRequestPosition  = ((MainActivity) getActivity()).getCurrentPosition();
         listEnd = ((MainActivity) getActivity()).getRequests().size();
         item = (EditText) view.findViewById(R.id.item);
         neededBy = (EditText) view.findViewById(R.id.neededBy);
@@ -129,13 +132,13 @@ public class RequestDetails extends ActionBarItemsHandler {
         acceptRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Position is "+ currentPosition);
-                System.out.println("Object Id is: "+((MainActivity)getActivity()).getRequests().get(currentPosition).getObjectId());
+                System.out.println("Position is "+ currrentRequestPosition);
+                System.out.println("Object Id is: "+((MainActivity)getActivity()).getRequests().get(currrentRequestPosition).getObjectId());
                 ParseQuery<Requests> query = ParseQuery.getQuery("Requests");
 
 
 // Retrieve the object by id
-                query.getInBackground(((MainActivity)getActivity()).getRequests().get(currentPosition).getObjectId(), new GetCallback<Requests>() {
+                query.getInBackground(((MainActivity)getActivity()).getRequests().get(currrentRequestPosition).getObjectId(), new GetCallback<Requests>() {
                     public void done(final Requests currentRequest, ParseException e) {
                         if (e == null) {
                             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
@@ -166,7 +169,9 @@ public class RequestDetails extends ActionBarItemsHandler {
                 ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
             }
         });
-        loadRequestDetails(((MainActivity)getActivity()).getPosition());
+        loadRequestDetails(((MainActivity)getActivity()).getCurrentPosition());
+
+
 
         return view;
     }
@@ -193,25 +198,25 @@ public class RequestDetails extends ActionBarItemsHandler {
     }
 
     public boolean onSwipeRight() {
-        if(currentPosition > 0){
-            currentPosition = currentPosition -1;
-            loadRequestDetails(currentPosition);
+        if(currrentRequestPosition > 0){
+            currrentRequestPosition = currrentRequestPosition -1;
+            loadRequestDetails(currrentRequestPosition);
 
         }
-        if(currentPosition ==0)
-            loadRequestDetails(currentPosition);
+        if(currrentRequestPosition ==0)
+            loadRequestDetails(currrentRequestPosition);
         return false;
     }
 
     public boolean onSwipeLeft() {
 
-        if( currentPosition < listEnd){
-            currentPosition = currentPosition + 1;
-            loadRequestDetails(currentPosition);
+        if( currrentRequestPosition < listEnd){
+            currrentRequestPosition = currrentRequestPosition + 1;
+            loadRequestDetails(currrentRequestPosition);
 
         }
-        if(currentPosition == listEnd)
-            loadRequestDetails(currentPosition);
+        if(currrentRequestPosition == listEnd)
+            loadRequestDetails(currrentRequestPosition);
 
         return false;
     }
@@ -294,4 +299,5 @@ public class RequestDetails extends ActionBarItemsHandler {
         transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
         transport.close();
     }
+
 }
