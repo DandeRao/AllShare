@@ -1,4 +1,8 @@
 package com.allshare_back4app.Model;
+/**
+ * Requests class to act as a entity for parse requests table
+ * Extends ParseObject Class
+ */
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
@@ -6,56 +10,34 @@ import com.parse.ParseObject;
 @ParseClassName("Requests")
 public class Requests extends ParseObject{
 
-    String requestedBy;
-    String neededBy;
-    String requestedOn;
     String item;
-    boolean isAccepted;
 
-
-    public boolean isAccepted() {
-        return isAccepted;
-    }
-
-    public void setAccepted(boolean accepted) {
-        isAccepted = accepted;
-    }
-
+    /**
+     * Default constructor
+     */
     public Requests() {
     }
 
+    /**
+     * Getter for item attribute
+     * @return item
+     */
     public String getItem() {
         return item;
     }
 
+    /**
+     * Setter for item attribute
+     * @param item
+     */
     public void setItem(String item) {
         this.item = item;
     }
 
-    public String getRequestedOn() {
-        return requestedOn;
-    }
-
-    public void setRequestedOn(String requestedOn) {
-        this.requestedOn = requestedOn;
-    }
-
-    public String getNeededBy() {
-        return neededBy;
-    }
-
-    public void setNeededBy(String neededBy) {
-        this.neededBy = neededBy;
-    }
-
-    public String getRequestedBy() {
-        return requestedBy;
-    }
-
-    public void setRequestedBy(String requestedBy) {
-        this.requestedBy = requestedBy;
-    }
-
+    /**
+     * toString method to use in regular ListView Adapters.
+     * @return
+     */
     @Override
     public String toString() {
         return  "Requested item: " + getString("item")+ "\n"+

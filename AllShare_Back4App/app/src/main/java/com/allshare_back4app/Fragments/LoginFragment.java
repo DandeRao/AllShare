@@ -17,7 +17,10 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-
+/**
+ * Login Fragment to enable the user to login to the application,
+ * Also sends flow to register screen for registering the user
+ */
 public class LoginFragment extends Fragment {
 
     Button login;
@@ -30,18 +33,30 @@ public class LoginFragment extends Fragment {
         // Required empty public constructor
     }
 
-
+    /**
+     * On Create view to handle all the above said things.
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
      @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
         System.out.println("Login Fragment Called");
-        View view = inflater.inflate(R.layout.fragment_login,container,false);
+      // Inflate the view
+         View view = inflater.inflate(R.layout.fragment_login,container,false);
+
+       //Set all the front end element hooks
         progressDialog = new ProgressDialog(this.getContext());
         userName = (EditText) view.findViewById(R.id.userName);
         password = (EditText) view.findViewById(R.id.password);
         login = (Button) view.findViewById(R.id.login);
 
+         // get current user to do auto login
          currentUser = ParseUser.getCurrentUser();
+         //Autologging in
          if (currentUser != null) {
+
              progressDialog.setMessage("Please Wait");
              progressDialog.setTitle("Logging in");
              progressDialog.show();
@@ -54,6 +69,7 @@ public class LoginFragment extends Fragment {
              // show the signup or login screen
          }
 
+        // Login button setting onClickListener
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,12 +80,13 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
+                            // Actual Login Step
                             parseLogin();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
-                }).start();
+                }).start(); // Done on seperate thread
 
             }
         });
@@ -78,23 +95,29 @@ public class LoginFragment extends Fragment {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Calling register fragment
                 ((MainActivity) getActivity()).replaceFragment(new RegisterFragment(),true);
             }
         });
         return view;
     }
 
+    /**
+     * Login Method
+     */
     void parseLogin(){
         ParseUser.logInInBackground(userName.getText().toString(), password.getText().toString(), new LogInCallback() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
                 // Passed login step, Load the requestsList fragment
                 if (parseUser != null) {
+                    // Login pass go to requestlist page
                     progressDialog.dismiss();
                     getUserDetailFromParse();
                     ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
 
                 } else {
+                    // Login Fail alert the user
                     progressDialog.dismiss();
                     alertDisplayer("Login Fail", e.getMessage()+" Please re-try");
                 }
@@ -103,15 +126,21 @@ public class LoginFragment extends Fragment {
     }
 
 
-
+    /**
+     * GetUserDetails from parsemethod to get a user (for logging in)
+     */
     void getUserDetailFromParse(){
         ParseUser user = ParseUser.getCurrentUser();
 
-     /*   t_username.setText(user.getUsername());
-        t_email.setText(user.getEmail());*/
         alertDisplayer("Welcome Back", "User:" + user.getUsername() +"\nEmail:"+user.getEmail());
 
     }
+
+    /**
+     * Method to be called for displaying alerts
+     * @param title Title for the alert
+     * @param message Message to be displayed in the alert
+     */
     void alertDisplayer(String title,String message){
         AlertDialog.Builder builder = new AlertDialog.Builder((MainActivity) getActivity())
                 .setTitle(title)

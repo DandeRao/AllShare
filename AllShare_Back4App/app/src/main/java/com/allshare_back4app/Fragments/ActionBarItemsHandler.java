@@ -11,6 +11,9 @@ import com.allshare_back4app.R;
 import com.parse.ParseUser;
 
 /**
+ * ActionBarItemsHandler, has all the requirements for a fragment and has actionbar items which are
+ * present in all the fragments
+ * Extemds
  * Created by mkrao on 11/17/2016.
  */
 

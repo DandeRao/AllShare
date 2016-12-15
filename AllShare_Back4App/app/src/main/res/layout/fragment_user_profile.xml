@@ -20,13 +20,13 @@
             android:textColor="#FFF"
             android:fontFamily="serif"
 
-            android:text="dcuiwecuo"
+            android:text="Default Value"
             android:gravity ="center"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:id="@+id/emailId_textView"
-            android:text="ajksdnj"
+            android:text="Default Value"
             android:textSize="25sp"
             android:textColor="#FFF"
             android:layout_gravity="center"

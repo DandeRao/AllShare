@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.allshare_back4app">
-
+ <!--Permission List-->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -10,18 +10,13 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />e
-
+<!--Permission to receive messages-->
     <permission
         android:name="com.allshare_back4app.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.allshare_back4app.permission.C2D_MESSAGE" />
 
-
-    <!--
-        <meta-data android:name="com.parse.push.gcm_sender_id"
-        android:value="id:855353218401" />;
-    -->
     <application
         android:name=".AllShareApplication"
         android:allowBackup="true"
@@ -40,7 +35,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+<!--Declared for receiving push notifications-->
         <meta-data android:name="com.parse.push.gcm_sender_id"
             android:value="id:855353218401" />
         <service android:name="com.parse.PushService" />

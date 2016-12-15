@@ -1,8 +1,10 @@
 package com.allshare_back4app.Model;
 
-import java.util.Date;
+
 
 /**
+ * Request class
+ * Model of common elements in the request
  * Created by mkrao on 11/19/2016.
  */
 
@@ -16,6 +18,10 @@ public class Request {
     String objectId;
     String postedOn;
 
+    /**
+     * GetterMethod for Posted on
+     * @return
+     */
     public String getPostedOn() {
         return postedOn;
     }
@@ -75,8 +81,5 @@ public class Request {
         this.requestedBy = requestedBy;
     }
 
-   /* @Override
-    public String toString() {
-        return  item  +"\n"+"Requested By: " + requestedBy;
-    }*/
+
 }

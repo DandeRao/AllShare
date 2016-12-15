@@ -18,7 +18,10 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
-
+/**
+ * Register Fragment to handle register functionality
+ * Extends Fragment
+ */
 public class RegisterFragment extends Fragment {
 
 Button register;
@@ -27,10 +30,20 @@ Button register;
     EditText password;
     EditText email;
 
+    /**
+     * No Arg Constructor
+     */
     public RegisterFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * On Create View used to handle all tasks in this fragment
+     * @param inflater inflater to inflate the layout
+     * @param container the view group
+     * @param savedInstanceState the bundle with previous state
+     * @return View created in the createView
+     */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,10 +61,12 @@ Button register;
                 progressDialog.setMessage("Please Wait");
                 progressDialog.setTitle("Registering");
                 progressDialog.show();
+                // Register Step in differetn thread
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
+                            //Calling parse Register method
                             parseRegister();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -63,7 +78,9 @@ Button register;
         return view;
     }
 
-
+    /**
+     * Method to contact parse servers for signing up
+     */
     void parseRegister(){
         ParseUser user = new ParseUser();
         user.setUsername(userName.getText().toString());
@@ -75,6 +92,7 @@ Button register;
 
                     progressDialog.dismiss();
                   /*  t_username.setText(ParseUser.getCurrentUser().getUsername());*/
+                   // User signed up by now, now saving the user by linking the device and account
                     saveNewUser();
                 } else {
                     progressDialog.dismiss();
@@ -83,6 +101,10 @@ Button register;
             }
         });
     }
+
+    /**
+     * Method to save user's session on device
+     */
     void saveNewUser(){
         ParseUser user = ParseUser.getCurrentUser();
         user.setUsername(userName.getText().toString());
@@ -91,14 +113,18 @@ Button register;
         user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                alertDisplayer("Registration Successful Welcome", "User:" + userName.getText().toString() + " Login.Email:" + email.getText().toString());
+                alertDisplayer("Registration Successful Welcome", "User:" + userName.getText().toString() + "\nEmail:" + email.getText().toString());
                 ((MainActivity) getActivity()).replaceFragment(new RequestsList(),false);
             }
         });
 
     }
 
-
+    /**
+     * Alert displayer method to reuse code for displaying the alerts
+     * @param title title of the alert
+     * @param message message to be displayed on the alert
+     */
     void alertDisplayer(String title,String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext())
                 .setTitle(title)

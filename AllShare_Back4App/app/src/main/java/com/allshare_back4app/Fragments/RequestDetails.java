@@ -39,6 +39,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 /**
+ * Request Details Fragment Extends actionbarItems for the actionbar handlers
  * A simple {@link Fragment} subclass.
  */
 public class RequestDetails extends ActionBarItemsHandler {
@@ -57,6 +58,8 @@ public class RequestDetails extends ActionBarItemsHandler {
     private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     int listEnd ;
+
+    // Gesture detector for detecting the swiping events to traverse through the requests
        final GestureDetector gesture = new GestureDetector(getActivity(),
             new GestureDetector.SimpleOnGestureListener() {
 
@@ -65,6 +68,14 @@ public class RequestDetails extends ActionBarItemsHandler {
                     return true;
                 }
 
+                /**
+                 * On Fling event handler
+                 * @param e1 event1
+                 * @param e2 event2
+                 * @param velocityX velocity on horizontal direction
+                 * @param velocityY velocity on vertical direction
+                 * @return true or false based on whether event consumed or not
+                 */
                 @Override
                 public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                                        float velocityY) {
@@ -75,12 +86,15 @@ public class RequestDetails extends ActionBarItemsHandler {
                     try {
                         if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
                             return false;
+                        // TO detect right to left fling
                         if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                             Log.i("On Right to Left", "Right to Left");
                             onSwipeLeft();
 
-                        } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+                        }
+                        // To detect left to right flings
+                        else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
                                 && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                             Log.i("On Left to Right", "Left to Right");
                             onSwipeRight();
@@ -96,7 +110,13 @@ public class RequestDetails extends ActionBarItemsHandler {
         // Required empty public constructor
     }
 
-
+    /**
+     * On CreateView for creating view and handling items
+     * @param inflater inflater for inflating layout
+     * @param container viewgroup in the view
+     * @param savedInstanceState Bundle with previous state(if any)
+     * @return View created
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,15 +130,15 @@ public class RequestDetails extends ActionBarItemsHandler {
                 return gesture.onTouchEvent(event);
             }
         });
+
+        // Get current position to load the request
         currrentRequestPosition  = ((MainActivity) getActivity()).getCurrentPosition();
         listEnd = ((MainActivity) getActivity()).getRequests().size();
         item = (EditText) view.findViewById(R.id.item);
         neededBy = (EditText) view.findViewById(R.id.neededBy);
         requestedBy = (EditText) view.findViewById(R.id.requestedBy);
         requestedOn = (EditText) view.findViewById(R.id.requestedOn);
-
-
-
+// Button to take to previous page
         goBack = (Button) view.findViewById(R.id.goBack);
         goBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +146,7 @@ public class RequestDetails extends ActionBarItemsHandler {
                 ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
             }
         });
-
+// Button to accept a request
         acceptRequest = (Button) view.findViewById(R.id.accept);
 
         acceptRequest.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +157,7 @@ public class RequestDetails extends ActionBarItemsHandler {
                 ParseQuery<Requests> query = ParseQuery.getQuery("Requests");
 
 
-// Retrieve the object by id
+
                 query.getInBackground(((MainActivity)getActivity()).getRequests().get(currrentRequestPosition).getObjectId(), new GetCallback<Requests>() {
                     public void done(final Requests currentRequest, ParseException e) {
                         if (e == null) {
@@ -147,6 +167,7 @@ public class RequestDetails extends ActionBarItemsHandler {
                             currentRequest.put("acceptedBy", ParseUser.getCurrentUser().getUsername());
                             currentRequest.put("acceptedOn",df.format(dateobj));
                             currentRequest.saveInBackground();
+                            // ASYNCTASK to generate email and send to requestor and acceptor
                              new AsyncTask<Void, Integer,Integer>() {
                                 @Override
                                 protected Integer doInBackground(Void... params) {
@@ -169,23 +190,23 @@ public class RequestDetails extends ActionBarItemsHandler {
                 ((MainActivity) getActivity()).replaceFragment(new RequestsList(),true);
             }
         });
+        // Set listview with an adapter and view
         loadRequestDetails(((MainActivity)getActivity()).getCurrentPosition());
-
-
-
         return view;
     }
 
+
+    /**
+     * Setting Listview with requests
+     * @param position
+     */
     public void loadRequestDetails(int position){
         System.out.println("Position is "+position);
         Request req = ((MainActivity) getActivity()).getRequests().get(position);
-     //   System.out.println(req.toString());
         item.setText(req.getItem());
         neededBy.setText(req.getNeededBy());
         requestedBy.setText(req.getRequestedBy());
         requestedOn.setText(req.getRequestedOn());
-    /*    System.out.println("requested BY = "+ req.getRequestedBy());
-        System.out.println("current user ");*/
         if(req.getRequestedBy().equals(ParseUser.getCurrentUser().getUsername())){
             acceptRequest.setVisibility(View.GONE);
         }
@@ -197,49 +218,61 @@ public class RequestDetails extends ActionBarItemsHandler {
 
     }
 
+    /**
+     * Method to handle siwpes not to take it out of bounds
+     * and load previous request
+      * @return
+     */
     public boolean onSwipeRight() {
+        // decrement the position by one to load previous request
         if(currrentRequestPosition > 0){
             currrentRequestPosition = currrentRequestPosition -1;
             loadRequestDetails(currrentRequestPosition);
 
         }
+        // iF the current position is first on the list just display the request
         if(currrentRequestPosition ==0)
             loadRequestDetails(currrentRequestPosition);
         return false;
     }
+    /**
+     * Method to handle siwpes not to take it out of bounds
+     * and load next request
+     * @return
+     */
 
     public boolean onSwipeLeft() {
-
+        // Increment the position by one to load next rewuest
         if( currrentRequestPosition < listEnd){
             currrentRequestPosition = currrentRequestPosition + 1;
             loadRequestDetails(currrentRequestPosition);
 
         }
+        // iF the current position is last on the just display the request
         if(currrentRequestPosition == listEnd)
             loadRequestDetails(currrentRequestPosition);
 
         return false;
     }
 
-
+    /**
+     *  Method to Generate email and send to Acceptor
+     * @param req
+     * @throws MessagingException
+     */
     public void generateAndSendEmailToAcceptor(Requests req) throws  MessagingException {
 
-
-        // Step1
-        System.out.println("\n 1st ===> setup Mail Server Properties..");
+// Get mailserver properties
         mailServerProperties = System.getProperties();
         mailServerProperties.put("mail.smtp.port", "587");
         mailServerProperties.put("mail.smtp.auth", "true");
         mailServerProperties.put("mail.smtp.starttls.enable", "true");
-        System.out.println("Mail Server Properties have been setup successfully..");
-
-        // Step2
-        System.out.println("\n\n 2nd ===> get Mail Session..");
+ // get session for email
         getMailSession = Session.getDefaultInstance(mailServerProperties, null);
         generateMailMessage = new MimeMessage(getMailSession);
         generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(ParseUser.getCurrentUser().getEmail()));
-        //generateMailMessage.addRecipient(Message.RecipientType.CC, new InternetAddress("test2@gmail.com"));
         generateMailMessage.setSubject("Details of Accepted Request");
+ // HTML format of the email
         String emailBody = "Here are the Details of the request you have accepted <br>" +
                 "Item: "+ req.getString("item")+"<br>"+
                 "Requested By: "+req.getString("RequestedBy")+"<br>"+
@@ -247,37 +280,33 @@ public class RequestDetails extends ActionBarItemsHandler {
                 "Accepted On: "+req.getString("acceptedOn")+"<br>"+
                 "You can Contact the requester at "+ req.getString("requestorEmail")
                 +". <br> Thankyou, <br> All Share team";
+ // Define type
         generateMailMessage.setContent(emailBody, "text/html");
-        System.out.println("Mail Session has been created successfully..");
-
-        // Step3
-        System.out.println("\n\n 3rd ===> Get Session and Send mail");
+ //Start Transport
         Transport transport = getMailSession.getTransport("smtp");
-
-        // Enter your correct gmail UserID and Password
-        // if you have 2FA enabled then provide App Specific Password
         transport.connect("smtp.gmail.com", "dandegus16105@gmail.com", "wwecmallikharjun");
         transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
+   //Close connection
         transport.close();
     }
 
+    /**
+     * Method to Generate email and send to requestor
+     * @param req
+     * @throws MessagingException
+     */
     public void generateAndSendEmailToRequestor(Requests req) throws  MessagingException {
-
-// Step1
-        System.out.println("\n 1st ===> setup Mail Server Properties..");
+// Get mailserver properties
         mailServerProperties = System.getProperties();
         mailServerProperties.put("mail.smtp.port", "587");
         mailServerProperties.put("mail.smtp.auth", "true");
         mailServerProperties.put("mail.smtp.starttls.enable", "true");
-        System.out.println("Mail Server Properties have been setup successfully..");
-
-        // Step2
-        System.out.println("\n\n 2nd ===> get Mail Session..");
+        // get session for email
         getMailSession = Session.getDefaultInstance(mailServerProperties, null);
         generateMailMessage = new MimeMessage(getMailSession);
         generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(req.getString("requestorEmail")));
-        //generateMailMessage.addRecipient(Message.RecipientType.CC, new InternetAddress("test2@gmail.com"));
         generateMailMessage.setSubject("An user has accepted to fulfil your request");
+        // HTML format of the email
         String emailBody = "You have requested for <br> " +
                 "Item: "+ req.getString("item")+"<br>"+
                 "Requested By: "+req.getString("RequestedBy")+"<br>"+
@@ -286,17 +315,13 @@ public class RequestDetails extends ActionBarItemsHandler {
                 "User "+ParseUser.getCurrentUser().getUsername() + " Has accepted your request."+"<br>"+
                 "You can contact "+ParseUser.getCurrentUser().getUsername()+" at "+ ParseUser.getCurrentUser().getEmail()
                 +". <br> Thankyou, <br> All Share team";
+        // Define type
         generateMailMessage.setContent(emailBody, "text/html");
-        System.out.println("Mail Session has been created successfully..");
-
-        // Step3
-        System.out.println("\n\n 3rd ===> Get Session and Send mail");
+        //Start Transport
         Transport transport = getMailSession.getTransport("smtp");
-
-        // Enter your correct gmail UserID and Password
-        // if you have 2FA enabled then provide App Specific Password
         transport.connect("smtp.gmail.com", "dandegus16105@gmail.com", "wwecmallikharjun");
         transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
+        //Close connection
         transport.close();
     }
 

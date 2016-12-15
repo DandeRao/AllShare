@@ -23,44 +23,68 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
+ * UserRequests Fragment created to display the requests Posted or accepted by user
+ * Extends Fragment
+ * * A simple {@link Fragment} subclass.
  */
 public class UserRequests extends Fragment {
 
-ListView userRequests;
+    ListView userRequests;
     TextView requestsTypeLabel;
     String fetching;
-    int showing ;
+    int showing;
+
+    /**
+     * No ARG Constructor
+     */
     public UserRequests() {
         // Required empty public constructor
     }
 
+    /**
+     * Called when user requests is created
+     * handles the attribure on click listeners, setting variables and getting requests list
+     * from parse database
+     * onCreateView method overrided
+     *
+     * @param inflater LayoutInflater to inflate the layouts
+     * @param container ViewGroup
+     * @param savedInstanceState Bundle with previous states
+     * @return View created in the screen
+     */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_requests, container, false);
-showing = ((MainActivity) getActivity()).getShowing();
+        showing = ((MainActivity) getActivity()).getShowing();
         requestsTypeLabel = (TextView) view.findViewById(R.id.request_type_label);
         userRequests = (ListView) view.findViewById(R.id.userRequests);
-        if(showing==1){
+        if (showing == 1) {
             requestsTypeLabel.setText("Requests Accepted");
             fetching = "acceptedBy";
-        }else{
+        } else {
             requestsTypeLabel.setText("Requests Posted");
             fetching = "RequestedBy";
         }
 
+        // Creating a parse query, using which the data from parse database is accessed
         ParseQuery<Requests> query = new ParseQuery<Requests>("Requests");
         query.whereEqualTo(fetching, ParseUser.getCurrentUser().getUsername());
-        query.findInBackground(new FindCallback<Requests>(){
-            @Override
+
+        // Parse Query runs in backround thus taking network access off the main thread
+                query.findInBackground(new FindCallback<Requests>() {
+                    /**
+                     * method done is called once the callback from back4app is received
+                     * @param list List of requests posted in back4app database
+                     * @param e Any Parse Exception during the query execution in background
+                     */
+                    @Override
             public void done(List<Requests> list, ParseException e) {
                 ArrayList<Request> lor = new ArrayList<Request>();
-                for(Requests r:list){
+                for (Requests r : list) {
 
-                    //    System.out.println(r.getString("item"));
                     Request nr = new Request();
 
                     nr.setItem(r.getString("item"));
@@ -68,16 +92,15 @@ showing = ((MainActivity) getActivity()).getShowing();
                     nr.setRequestedBy(r.getString("RequestedBy"));
                     nr.setRequestedOn(r.getString("requestedOn"));
                     nr.setPostedOn(r.getString("acceptedOn"));
-                    System.out.println("Getting objectIds "+ r.getObjectId());
+                    System.out.println("Getting objectIds " + r.getObjectId());
                     nr.setObjectId(r.getObjectId());
 
-                    //   System.out.println(nr.toString());
                     lor.add(nr);
                 }
-                ArrayAdapter adapter = new UserProfilePostedAdapter(getContext(),R.layout.user_request_adapter,R.id.row_request_item,lor);
+
+        // Loading the requests posted list into the custom adapter
+                ArrayAdapter adapter = new UserProfilePostedAdapter(getContext(), R.layout.user_request_adapter, R.id.row_request_item, lor);
                 userRequests.setAdapter(adapter);
-                /*ArrayAdapter adapter = new ArrayAdapter<Requests>( getContext(),android.R.layout.simple_list_item_1,list);
-                userRequests.setAdapter(adapter);*/
             }
         });
 

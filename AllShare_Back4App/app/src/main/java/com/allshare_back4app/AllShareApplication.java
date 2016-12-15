@@ -26,6 +26,8 @@ import tgio.parselivequery.Subscription;
 import tgio.parselivequery.interfaces.OnListener;
 
 /**
+ * Android Application Class to declare parse values and initialize the application.
+ * ALso registers the device for push notifications
  * Created by mkrao on 11/20/2016.
  */
 
@@ -40,19 +42,22 @@ public class AllShareApplication extends Application {
         super.onCreate();
 
          ParseObject.registerSubclass(Requests.class);
-
+// Parse Initialization
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId("iHC7u9QFrvp51WsWHwOCCNaG8ASnJloDWjKXn20l")
                 .clientKey("UPAjRXifzfU96kZPW5bRbtnnxyi7wyq9LgjV6njj")
                 .server("https://parseapi.back4app.com/").build()
         );
+
         Parse.setLogLevel(Parse.LOG_LEVEL_VERBOSE);
         Log.d("Parse","Initialized");
+// Installation declaration and setup to receive Push notifications from Google Cloud Messaging services.
         ParseInstallation installation = ParseInstallation.getCurrentInstallation();
         installation.put("GCMSenderId", "855353218401");
         installation.saveInBackground();
         OneSignal.startInit(this).init();
 
+// Subscribing for parse channels
         ParsePush.subscribeInBackground("Requests", new SaveCallback() {
             @Override
             public void done(ParseException e) {
