@@ -1,0 +1,40 @@
+Team - Worker Bees
+Team Members: Mallikharjuna Rao Dande,
+		Sanket Selokar,
+		Sanjana Somisetty
+		Sravya Kandepu
+
+Work Completed:
+
+UI
+	-> Not stock theme
+	-> Custom ListVIews
+	
+Request handling
+	->postin request
+	->accepting request
+	-> sending information about request accepted 
+
+User Handling
+	-> Login
+	-> Logout
+	-> Register
+
+Gesture Handling
+	-> On Fling handling
+
+ActionBar Handling
+	-> Refresh and Add request
+
+Location Based Requests
+	-> Showing requests based on proximity to user
+	
+Aplicatin Backend
+	->Connecting to Back4App
+	->Databases and connectivity
+
+PushNotification
+	-> Recieves notificatoins from parse dashboard but client pushes are disabled from server end
+	
+Work Not completed:
+Adding View Pager. (Animation when swiping left or right)
